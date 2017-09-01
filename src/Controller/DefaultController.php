@@ -16,7 +16,6 @@ class DefaultController extends GeneralController
             $request,
             $productRepository->countAll()
         );
-
         $viewParameters = $request->getSession();
 
         $viewParameters['filterDates'] = [];
@@ -58,12 +57,36 @@ class DefaultController extends GeneralController
 
         $filterDates = $request->getFormData();
         unset($filterDates['submit']);
-        $viewParameters['filterDates'] = $filterDates;
-
         if (empty($filterDates)) {
             $this->redirect('');
         }
-        $params = [];
+        $viewParameters['filterDates'] = $filterDates;
+        $params = $this->getCheckedFilters($filterDates);
+        $products = $productRepository->getProductsFiltered($params);
+        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
+            $request,
+            count($products)
+        );
+        $viewParameters['perPage'] = $perPage;
+        $viewParameters['currentPage'] = $currentPage;
+        $viewParameters['totalPages'] = $totalPages;
+        $viewParameters['previous'] = $previous;
+        $viewParameters['next'] = $next;
+        $viewParameters['pageURL'] = '/iMAG/filters';
+        $viewParameters['query'] = $request->giveTheQuery();
+        $viewParameters['pageTitle'] = "Filtrare produse";
+        $viewParameters['products'] = $products;
+        $characteristicRepository = AppContainer::get('characteristicsRepository');
+        $characteristics = $characteristicRepository->join2tablesLike('c.name', 'cp.value', 'characteristics c',
+            'products_characteristics cp', 'c.id', 'cp.characteristic_id');
+        sort($characteristics);
+        $viewParameters['characteristics'] = $characteristics;
+        return Response::view('filters_products', $viewParameters);
+    }
+
+    public function getCheckedFilters($filterDates)
+    {
+        $params=[];
         if (!empty($filterDates['price'])) {
             $arrayPrices = [];
             $prices = $filterDates['price'];
@@ -90,38 +113,6 @@ class DefaultController extends GeneralController
             $aprindereElectrica = $filterDates['aprindereElectrica'];
             $params['aprindereElectrica'] = $aprindereElectrica;
         }
-        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
-            $request,
-            $productRepository->countAll()
-        );
-        $viewParameters['perPage'] = $perPage;
-        $viewParameters['currentPage'] = $currentPage;
-        $viewParameters['totalPages'] = $totalPages;
-        $viewParameters['previous'] = $previous;
-        $viewParameters['next'] = $next;
-
-        $offset = $perPage * ($currentPage - 1);
-        $products = $productRepository->getProductsFiltered($params, $offset, $perPage);
-        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
-            $request,
-            count($products)
-        );
-        $viewParameters['perPage'] = $perPage;
-        $viewParameters['currentPage'] = $currentPage;
-        $viewParameters['totalPages'] = $totalPages;
-        $viewParameters['previous'] = $previous;
-        $viewParameters['next'] = $next;
-        $viewParameters['pageURL'] = '/iMAG/filters';
-        $viewParameters['query'] = $request->giveTheQuery();
-        $viewParameters['pageTitle'] = "Filtrare produse";
-        $viewParameters['products'] = $products;
-        $characteristicRepository = AppContainer::get('characteristicsRepository');
-        $characteristics = $characteristicRepository->join2tablesLike('c.name', 'cp.value', 'characteristics c',
-            'products_characteristics cp', 'c.id', 'cp.characteristic_id');
-        sort($characteristics);
-        $viewParameters['characteristics'] = $characteristics;
-        return Response::view('filters_products', $viewParameters);
-
-
+        return $params;
     }
 }

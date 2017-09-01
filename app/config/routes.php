@@ -34,12 +34,15 @@ $router->get('iMAG/viewProduct', 'ProductController:viewProduct');
 
 $router->get('iMAG/search', 'ProductController:searchProduct');
 
-$router->post('iMAG/filters', 'DefaultController:filters');
+$router->post('iMAG', 'DefaultController:filters');
 
 $router->post('iMAG/addToCart', 'CartController:add');
 
 $router->get('iMAG/cart', 'CartController:viewCart');
 
 $router->post('iMAG/ajax-remove-from-cart', 'CartController:removeFromCart');
+
+
+
 
 
