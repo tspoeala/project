@@ -16,18 +16,13 @@ class DefaultController extends GeneralController
             $request,
             $productRepository->countAll()
         );
-        $viewParameters = $request->getSession();
-
-        $viewParameters['filterDates'] = [];
-        $viewParameters['pageTitle'] = "iMAG";
         if (isset($request->getSession()['user'])) {
             $viewParameters['esteLogat'] = 'Este Logat!';
         }
-        $viewParameters['perPage'] = $perPage;
-        $viewParameters['currentPage'] = $currentPage;
-        $viewParameters['totalPages'] = $totalPages;
-        $viewParameters['previous'] = $previous;
-        $viewParameters['next'] = $next;
+        $viewParameters = array_merge($request->getSession(),$this->configPagination($perPage,$currentPage,$totalPages,
+            $previous,$next));
+        $viewParameters['filterDates'] = [];
+        $viewParameters['pageTitle'] = "iMAG";
         $viewParameters['pageURL'] = '/iMAG';
         $viewParameters['query'] = $request->giveTheQuery();
         $request->writeToSession('uri', Request::uri());
@@ -54,7 +49,6 @@ class DefaultController extends GeneralController
     {
         $viewParameters = $request->getSession();
         $productRepository = AppContainer::get('productRepository');
-
         $filterDates = $request->getFormData();
         unset($filterDates['submit']);
         if (empty($filterDates)) {
@@ -62,7 +56,7 @@ class DefaultController extends GeneralController
         }
         $viewParameters['filterDates'] = $filterDates;
         $params = $this->getCheckedFilters($filterDates);
-        $products = $productRepository->getProductsFiltered($params);
+          $products = $productRepository->getProductsFiltered($params);
         list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
             $request,
             count($products)

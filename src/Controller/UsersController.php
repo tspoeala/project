@@ -18,12 +18,8 @@ class UsersController extends GeneralController
             $request,
             $userRepository->countAll()
         );
-        $viewParameters = $request->getSession();
-        $viewParameters['perPage'] = $perPage;
-        $viewParameters['currentPage'] = $currentPage;
-        $viewParameters['totalPages'] = $totalPages;
-        $viewParameters['previous'] = $previous;
-        $viewParameters['next'] = $next;
+        $viewParameters = array_merge($request->getSession(),$this->configPagination($perPage,$currentPage,$totalPages,
+            $previous,$next));
         $viewParameters['pageURL'] = '/iMAG/tableUsers';
         $viewParameters['pageTitle'] = 'Users';
         $users = $userRepository->getSubset($perPage * ($currentPage - 1), $perPage);
@@ -37,7 +33,6 @@ class UsersController extends GeneralController
     public function viewUser(Request $request)
     {
         $request->writeToSession('pageTitle', "View User");
-        $viewParameters = $request->getSession();
         if (!empty($request->getSession()["user"])) {
             $id = $request->getQuery()['id'];
             $userRepository = AppContainer::get('userRepository');
@@ -53,12 +48,8 @@ class UsersController extends GeneralController
                 $request,
                 $productRepository->countAllWhereCondition('id_user', $id)
             );
-
-            $viewParameters['perPage'] = $perPage;
-            $viewParameters['currentPage'] = $currentPage;
-            $viewParameters['totalPages'] = $totalPages;
-            $viewParameters['previous'] = $previous;
-            $viewParameters['next'] = $next;
+            $viewParameters = array_merge($request->getSession(),$this->configPagination($perPage,$currentPage,$totalPages,
+                $previous,$next));
             $viewParameters['pageURL'] = '/iMAG/view?id=' . $id;
             $viewParameters['query'] = $request->giveTheQuery();
 

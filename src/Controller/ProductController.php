@@ -128,8 +128,7 @@ class ProductController extends GeneralController
         }
     }
 
-    public
-    function viewProduct(Request $request)
+    public function viewProduct(Request $request)
     {
         $productId = $request->getQuery()['id'];
 
@@ -159,8 +158,7 @@ class ProductController extends GeneralController
         return Response::view('view_product', $viewParameters);
     }
 
-    public
-    function searchProduct(Request $request)
+    public function searchProduct(Request $request)
     {
         $viewParameters = $request->getSession();
         $titleProductSearch = $request->getQuery()['name'];

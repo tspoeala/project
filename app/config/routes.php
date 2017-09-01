@@ -43,6 +43,3 @@ $router->get('iMAG/cart', 'CartController:viewCart');
 $router->post('iMAG/ajax-remove-from-cart', 'CartController:removeFromCart');
 
 
-
-
-

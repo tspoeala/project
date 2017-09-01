@@ -124,24 +124,31 @@
     <?php } ?>
 
     <!-- Products -->
-    <div class="row">
-        <?php foreach ($products as $product) { ?>
-            <div class="col-sm-4 col-lg-4 col-md-4">
-                <div class="thumbnail">
-                    <img src="src/Resources/images/<?php echo $product->photo; ?>" width="100" height="100" alt="">
-                    <div class="caption">
-                        <h4>
-                            <a href="/iMAG/viewProduct?id=<?php echo $product->id_produs; ?>"><?php echo $product->title; ?></a>
-                        </h4>
-                        <h4><?php echo $product->price; ?> Lei</h4>
+    <div class="container top-item">
+        <div class="row">
+
+            <?php foreach ($products as $product) { ?>
+                <div class="col-sm-4 col-lg-4 col-md-4">
+                    <div class="thumbnail">
+                        <a href="/iMAG/viewProduct?id=<?php echo $product->id_produs; ?>">
+                            <img src="src/Resources/images/<?php echo $product->photo; ?>">
+                            <div class="caption">
+                                <h4><?php echo $product->title; ?></h4>
+                                <h4><?php echo $product->price; ?> Lei</h4>
+                            </div>
+                        </a>
+
                         <?php if ($user->admin != 0 || $product->id_user == $user->id) { ?>
-                            <h4><a href="/iMAG/updateProduct?id=<?php echo $product->id_produs; ?>">Update Product</a>
-                            </h4>
+                            <a href="/iMAG/updateProduct?id=<?php echo $product->id_produs; ?>">Update
+                                Product
+                            </a>
                         <?php } ?>
+
                     </div>
                 </div>
-            </div>
-        <?php } ?>
+            <?php } ?>
+        </div>
+
     </div>
 
     <!-- Hidden template -->
