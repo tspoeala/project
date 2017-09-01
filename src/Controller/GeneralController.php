@@ -68,4 +68,15 @@ class GeneralController
         return array($perPage, $currentPage, $totalPages, $previous, $next);
     }
 
+    public function configPagination($perPage,$currentPage,$totalPages,$previous,$next)
+    {
+        $viewParameters['perPage'] = $perPage;
+        $viewParameters['currentPage'] = $currentPage;
+        $viewParameters['totalPages'] = $totalPages;
+        $viewParameters['previous'] = $previous;
+        $viewParameters['next'] = $next;
+        return $viewParameters;
+
+    }
+
 }

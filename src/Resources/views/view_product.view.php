@@ -50,24 +50,30 @@
                         </td>
 
                     </tr>
-                <?php }?>
-               <?php} ?>
-            <?php if (isset($user) && $user->id != $product->id_user) { ?>
+
+
+                <?php }
+            } ?>
+            <?php if (isset($user)) { ?>
 
                 <tr>
                     <td></td>
                     <td></td>
                     <td>
-                        <button name="addToCart" class="btn" id="addToCart"
+                        <button name=" addToCart" class="btn" id="addToCart"
                                 data-productId="<?php echo $product->id_produs; ?>">
                             Adauga in cos
                         </button>
+
                     </td>
                 </tr>
             <?php } ?>
             </tbody>
         </table>
     </div>
+
+
+
 
     <script
             src="https://code.jquery.com/jquery-3.2.1.min.js"
