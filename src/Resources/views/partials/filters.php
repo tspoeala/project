@@ -3,7 +3,6 @@ function filterIsSet($field, $filter, $filterData)
 {
     return isset($filterData) && array_key_exists($field, $filterData) && in_array($filter, $filterData[$field]);
 }
-
 ?>
 
 <div class="col-xs-3 col-sm-3">
@@ -12,7 +11,7 @@ function filterIsSet($field, $filter, $filterData)
             <h3 class="panel-title">Filter de cautare</h3>
         </div>
 
-        <form action="filters" method="post">
+        <form action="" method="post">
             <div class="panel-body">
                 <div class="panel-heading ">
                     <h4 class="panel-title">
@@ -208,5 +207,3 @@ function filterIsSet($field, $filter, $filterData)
         </form>
     </div>
 </div>
-
-
