@@ -27,21 +27,15 @@ class DefaultController extends GeneralController
         $viewParameters['query'] = $request->giveTheQuery();
         $request->writeToSession('uri', Request::uri());
         $request->writeToSession('query', $request->giveTheQuery());
-
         $offset = $perPage * ($currentPage - 1);
         $products = $productRepository->getSubsetOrderBy($offset, $perPage);
         $viewParameters['products'] = $products;
-
-
         $request->removeFromSession('errors');
-
         $characteristicRepository = AppContainer::get('characteristicsRepository');
         $characteristics = $characteristicRepository->join2tablesLike('c.name', 'cp.value', 'characteristics c',
             'products_characteristics cp', 'c.id', 'cp.characteristic_id');
         sort($characteristics);
         $viewParameters['characteristics'] = $characteristics;
-
-
         return Response::view('index', $viewParameters);
     }
 
