@@ -70,7 +70,7 @@ class ProductController extends GeneralController
         $viewParameters['product'] = $product;
         $request->writeToSession('product', $product);
 
-        $viewParameters['pageTitle'] = "Update Product";
+        $viewParameters['pageTitle'] = $this->getTitle("Update Product");
         $this->checkUserAccess($request);
         return Response::view('update_product', $viewParameters);
     }
@@ -133,7 +133,7 @@ class ProductController extends GeneralController
         $productId = $request->getQuery()['id'];
 
         $viewParameters = $request->getSession();
-        $viewParameters['pageTitle'] = "View Product";
+        $viewParameters['pageTitle'] = $this->getTitle("View Product");
 
 
         if (!preg_match('/^[0-9]+$/', $productId)) {
@@ -167,7 +167,7 @@ class ProductController extends GeneralController
         $productRepo = AppContainer::get('productRepository');
         $products = $productRepo->selectByFieldLikeFromTable('title', "$titleProductSearch%");
         $viewParameters['products'] = $products;
-        $viewParameters['pageTitle'] = 'Search Product';
+        $viewParameters['pageTitle'] = $this->getTitle("Search Product");
         return Response::view('search_product', $viewParameters);
     }
 }

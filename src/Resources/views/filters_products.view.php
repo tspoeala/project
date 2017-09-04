@@ -30,5 +30,5 @@
     </div>
 
 
-<?php require 'partials/pagination.php'; ?>
+<?php //require 'partials/pagination.php'; ?>
 <?php require('partials/footer.php'); ?>

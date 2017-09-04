@@ -112,7 +112,7 @@ class ProductRepository extends QueryBuilder
         $this->updatee(self::TABLE, $id, $values);
     }
 
-    public function getProductsFiltered($params, $offset = 0, $limit = 10)
+    public function getProductsFiltered($params=[], $offset=0, $limit=10)
     {
         $str = "SELECT * FROM " . self::TABLE;
         $prices = [];
@@ -182,8 +182,11 @@ class ProductRepository extends QueryBuilder
                     $str .= " OR ";
                 }
             }
-            $str .= ')';
+            $str .= ")";
+
         }
+        $str.= " ORDER BY ".self::ID." DESC limit {$offset}, {$limit}";
+
         $statement = $this->pdo->prepare($str);
 
         $statement->execute();
