@@ -1,8 +1,5 @@
 <?php
-
-
 namespace Src\Controllers;
-
 use App\AppContainer;
 use App\Request;
 use Src\Repository\ProductRepository;
@@ -31,14 +28,13 @@ class CartController
         $request->writeToSession('totalProducts', count($cart));
         echo json_encode($array);
     }
-
     public function removeFromCart(Request $request)
     {
         $id = $request->getFormData()['id'];
         $totalPrice = 0;
         $cart = $request->getSession()['cart'];
         foreach (array_keys($cart, $id) as $key) {
-                unset($cart[$key]);
+            unset($cart[$key]);
         }
         $request->removeFromSession('cart');
         $request->writeToSession('cart', $cart);
@@ -56,7 +52,6 @@ class CartController
         $array['totalProducts'] = $totalProducts;
         echo json_encode($array);
     }
-
     public function viewCart(Request $request)
     {
         $viewParameters = $request->getSession();

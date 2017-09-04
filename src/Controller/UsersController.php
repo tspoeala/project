@@ -21,7 +21,7 @@ class UsersController extends GeneralController
         $viewParameters = array_merge($request->getSession(),$this->configPagination($perPage,$currentPage,$totalPages,
             $previous,$next));
         $viewParameters['pageURL'] = '/iMAG/tableUsers';
-        $viewParameters['pageTitle'] = 'Users';
+        $viewParameters['pageTitle'] = $this->getTitle('Users');
         $users = $userRepository->getSubset($perPage * ($currentPage - 1), $perPage);
         $viewParameters['users'] = $users;
         $viewParameters['query'] = $request->giveTheQuery();
@@ -32,7 +32,6 @@ class UsersController extends GeneralController
 
     public function viewUser(Request $request)
     {
-        $request->writeToSession('pageTitle', "View User");
         if (!empty($request->getSession()["user"])) {
             $id = $request->getQuery()['id'];
             $userRepository = AppContainer::get('userRepository');
@@ -52,6 +51,7 @@ class UsersController extends GeneralController
                 $previous,$next));
             $viewParameters['pageURL'] = '/iMAG/view?id=' . $id;
             $viewParameters['query'] = $request->giveTheQuery();
+            $viewParameters['pageTitle']= $this->getTitle("View User");
 
             $products = $productRepository->getSubsetCondition('id_user', $id, $perPage * ($currentPage - 1), $perPage);
 

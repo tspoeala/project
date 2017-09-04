@@ -1,12 +1,8 @@
 <?php
-
 namespace Src\Controllers;
-
 use App\AppContainer;
 use App\Request;
 use App\Response;
-
-
 class DefaultController extends GeneralController
 {
     public function index(Request $request)
@@ -16,13 +12,13 @@ class DefaultController extends GeneralController
             $request,
             $productRepository->countAll()
         );
+        $viewParameters = array_merge($request->getSession(),$this->configPagination($perPage,$currentPage,$totalPages,
+            $previous,$next));
         if (isset($request->getSession()['user'])) {
             $viewParameters['esteLogat'] = 'Este Logat!';
         }
-        $viewParameters = array_merge($request->getSession(),$this->configPagination($perPage,$currentPage,$totalPages,
-            $previous,$next));
         $viewParameters['filterDates'] = [];
-        $viewParameters['pageTitle'] = "iMAG";
+        $viewParameters['pageTitle'] = $this->getTitle("iMAG");
         $viewParameters['pageURL'] = '/iMAG';
         $viewParameters['query'] = $request->giveTheQuery();
         $request->writeToSession('uri', Request::uri());
@@ -38,7 +34,6 @@ class DefaultController extends GeneralController
         $viewParameters['characteristics'] = $characteristics;
         return Response::view('index', $viewParameters);
     }
-
     public function filters(Request $request)
     {
         $viewParameters = $request->getSession();
@@ -50,7 +45,7 @@ class DefaultController extends GeneralController
         }
         $viewParameters['filterDates'] = $filterDates;
         $params = $this->getCheckedFilters($filterDates);
-          $products = $productRepository->getProductsFiltered($params);
+        $products = $productRepository->getProductsFiltered($params);
         list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
             $request,
             count($products)
@@ -60,9 +55,9 @@ class DefaultController extends GeneralController
         $viewParameters['totalPages'] = $totalPages;
         $viewParameters['previous'] = $previous;
         $viewParameters['next'] = $next;
-        $viewParameters['pageURL'] = '/iMAG/filters';
+        $viewParameters['pageURL'] = '/iMAG';
         $viewParameters['query'] = $request->giveTheQuery();
-        $viewParameters['pageTitle'] = "Filtrare produse";
+        $viewParameters['pageTitle'] = $this->getTitle("Filtrare produse");
         $viewParameters['products'] = $products;
         $characteristicRepository = AppContainer::get('characteristicsRepository');
         $characteristics = $characteristicRepository->join2tablesLike('c.name', 'cp.value', 'characteristics c',
@@ -71,7 +66,6 @@ class DefaultController extends GeneralController
         $viewParameters['characteristics'] = $characteristics;
         return Response::view('filters_products', $viewParameters);
     }
-
     public function getCheckedFilters($filterDates)
     {
         $params=[];

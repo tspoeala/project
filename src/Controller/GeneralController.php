@@ -33,9 +33,8 @@ class GeneralController
         return md5($password);
     }
 
-    function im_awesome_title($title)
+    protected function getTitle($title="Im awesome!")
     {
-        $title = "Im awesome!";
         return $title;
     }
 

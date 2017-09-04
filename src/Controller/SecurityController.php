@@ -17,8 +17,9 @@ class SecurityController extends GeneralController
         if (isset($request->getSession()["user"])) {
             $this->redirect('tableUsers');
         }
-        $request->writeToSession('pageTitle', "Login");
-        return Response::view('login', $request->getSession());
+        $viewParameters = $request->getSession();
+        $viewParameters['pageTitle'] = $this->getTitle("Login");
+        return Response::view('login', $viewParameters);
     }
 
     public function logout(Request $request)
@@ -31,7 +32,7 @@ class SecurityController extends GeneralController
 
     public function register(Request $request)
     {
-        $request->writeToSession('pageTitle', "Register");
+        $request->writeToSession('pageTitle',"Register");
         if (isset($request->getSession()["user"])) {
             $this->redirect('tableUsers');
         }
