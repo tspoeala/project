@@ -18,15 +18,12 @@ class UsersController extends GeneralController
             $request,
             $userRepository->countAll()
         );
-        $viewParameters = array_merge($request->getSession(),$this->configPagination($perPage,$currentPage,$totalPages,
-            $previous,$next));
-        $viewParameters['pageURL'] = '/iMAG/tableUsers';
-        $viewParameters['pageTitle'] = $this->getTitle('Users');
+        $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
+            $previous, $next, $this->getTitle('Users'), '/iMAG/tableUsers'));
         $users = $userRepository->getSubset($perPage * ($currentPage - 1), $perPage);
         $viewParameters['users'] = $users;
         $viewParameters['query'] = $request->giveTheQuery();
         $request->writeToSession('query', $request->giveTheQuery());
-
         return Response::view('table_with_users', $viewParameters);
     }
 
@@ -38,28 +35,21 @@ class UsersController extends GeneralController
             if (!preg_match('/^[0-9]+$/', $id)) {
                 $request->writeToSession('errors', ["Id-ul nu este nr !"]);
                 $this->redirect('tableUsers');
-
             }
-            $request->removeFromSession('errors');
             $productRepository = AppContainer::get('productRepository');
 
             list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
                 $request,
                 $productRepository->countAllWhereCondition('id_user', $id)
             );
-            $viewParameters = array_merge($request->getSession(),$this->configPagination($perPage,$currentPage,$totalPages,
-                $previous,$next));
-            $viewParameters['pageURL'] = '/iMAG/view?id=' . $id;
+            $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
+                $previous, $next, $this->getTitle("View User"), '/iMAG/view?id=' . $id));
             $viewParameters['query'] = $request->giveTheQuery();
-            $viewParameters['pageTitle']= $this->getTitle("View User");
-
             $products = $productRepository->getSubsetCondition('id_user', $id, $perPage * ($currentPage - 1), $perPage);
-
             $viewParameters['products'] = $products;
             $characteristicsRepository = AppContainer::get('characteristicsRepository');
             $characteristics = $characteristicsRepository->selectAllFromTable();
             $request->writeToSession('characteristics', $characteristics);
-
             $users = $userRepository->selectByFieldFromTable('id', $id);
             if (!empty($users)) {
                 $user = $users[0];
@@ -69,7 +59,6 @@ class UsersController extends GeneralController
                 return Response::view('view_user', $viewParameters);
             }
             $request->writeToSession('errors', ["Id-ul nu se gaseste in baza de date !"]);
-
             $this->redirect('tableUsers');
         }
         $this->checkUserAccess($request);
@@ -111,21 +100,25 @@ class UsersController extends GeneralController
         $this->checkUserAccess($request);
     }
 
+    public function updateUserIntoTable(Request $request, $userData)
+    {
+        AppContainer::get('userRepository')->updateTable($request->getSession()['id'], [
+            'firstname' => $userData['firstname'],
+            'lastname' => $userData['lastname'],
+            'username' => $userData['username'],
+            'email' => $userData['email']
+        ]);
+    }
+
     public function saveUser(Request $request)
     {
         if (!empty($request->getSession()["user"])) {
 
             $userData = $request->getFormData();
-
-            AppContainer::get('userRepository')->updateTable($request->getSession()['id'], [
-                'firstname' => $userData['firstname'],
-                'lastname' => $userData['lastname'],
-                'username' => $userData['username'],
-                'email' => $userData['email']
-
-            ]);
+            $this->updateUserIntoTable($request, $userData);
             $this->redirect('tableUsers?' . $request->getSession()['query']);
         }
-        $this->checkUserAccess($request);
+        //$this->checkUserAccess($request);
     }
+
 }

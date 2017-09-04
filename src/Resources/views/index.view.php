@@ -12,7 +12,7 @@
             <div class="col-sm-4 col-lg-4 col-md-4">
                 <div class="thumbnail">
                     <a href="/iMAG/viewProduct?id=<?php echo $product->id_produs; ?>">
-                        <img src="src/Resources/images/<?php echo $product->photo; ?>">
+                        <img src="src/Resources/images/<?php echo $product->photo; ?>" >
                         <div class="caption">
                             <h4><?php echo $product->title; ?></h4>
                             <h4><?php echo $product->price; ?> Lei</h4>

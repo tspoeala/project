@@ -1,5 +1,7 @@
 <?php
+
 namespace Src\Controllers;
+
 use App\AppContainer;
 use App\Request;
 use Src\Repository\ProductRepository;
@@ -28,6 +30,7 @@ class CartController
         $request->writeToSession('totalProducts', count($cart));
         echo json_encode($array);
     }
+
     public function removeFromCart(Request $request)
     {
         $id = $request->getFormData()['id'];
@@ -36,11 +39,8 @@ class CartController
         foreach (array_keys($cart, $id) as $key) {
             unset($cart[$key]);
         }
-        $request->removeFromSession('cart');
         $request->writeToSession('cart', $cart);
-        $request->removeFromSession('totalProducts');
-        $totalProducts = count($cart);
-        $request->writeToSession('totalProducts', $totalProducts);
+        $request->writeToSession('totalProducts', count($cart));
         $productRepo = AppContainer::get('productRepository');
         foreach ($cart as $idCart) {
             $product = $productRepo->selectByFieldFromTable('id_produs', $idCart)[0];
@@ -49,9 +49,10 @@ class CartController
         $request->writeToSession('totalPrice', $totalPrice);
         $array['totalPrice'] = $totalPrice;
         $array['products'] = $cart;
-        $array['totalProducts'] = $totalProducts;
+        $array['totalProducts'] = count($cart);
         echo json_encode($array);
     }
+
     public function viewCart(Request $request)
     {
         $viewParameters = $request->getSession();

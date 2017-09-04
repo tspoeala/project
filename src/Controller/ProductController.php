@@ -10,46 +10,73 @@ use App\Response;
 
 class ProductController extends GeneralController
 {
-    public function addProduct(Request $request)
+    public function trimProductData($productData)
     {
-        $id = $request->getSession()["user"]->id;
-        $productData = $request->getFormData();
-        $viewParameters = $request->getSession();
         $productData['title'] = trim($productData['title']);
         $productData['price'] = trim($productData['price']);
         $productData['description'] = trim($productData['description']);
+        return $productData;
+
+    }
+
+    public function insertProductIntoTable($id, $productData, $image)
+    {
+        AppContainer::get('productRepository')->insertIntoTable([
+            'id_user' => $id,
+            'title' => $productData['title'],
+            'price' => $productData['price'],
+            'description' => strip_tags($productData['description']),
+            'photo' => $image,
+
+        ]);
+    }
+
+    public function insertCharacteristics($characteristics, $value, $productId)
+    {
+        foreach ($characteristics as $key => $characteristicId) {
+            AppContainer::get('productCharacteristicsRepository')->insertIntoTable([
+                'product_id' => $productId,
+                'characteristic_id' => $characteristicId,
+                'value' => ucfirst($value[$key]),
+            ]);
+        }
+    }
+
+    public function updateProductIntoTable($id, $idUser, $productData, $photo)
+    {
+        AppContainer::get('productRepository')->updateTable($id, [
+            'id_user' => $idUser,
+            'title' => $productData['title'],
+            'price' => $productData['price'],
+            'description' => strip_tags($productData['description']),
+            'photo' => $photo,
+
+        ]);
+    }
+
+    public function addProduct(Request $request)
+    {
+        $id = $request->getSession()["user"]->id;
+        $productData = $this->trimProductData($request->getFormData());
+        $viewParameters = $request->getSession();
         $errors = (new ValidatorProduct())->validate($productData, $request);
         $viewParameters['errors'] = $errors;
-        if (empty($errors)) {
-            $request->removeFromSession('productData');
-            $image = $request->getFilesData('photo')["name"];
-            $request->writeToSession('image', $image);
-            AppContainer::get('productRepository')->insertIntoTable([
-                'id_user' => $id,
-                'title' => $productData['title'],
-                'price' => $productData['price'],
-                'description' => strip_tags($productData['description']),
-                'photo' => $image,
-
-            ]);
-            $characteristics = $productData['characteristic'];
-            $value = $productData['value'];
-            $productId = AppContainer::get('productRepository')
-                ->selectColumnFromTable('id_produs', 'title', $productData['title'])[0]['id_produs'];
-
-            foreach ($characteristics as $key => $characteristicId) {
-                AppContainer::get('productCharacteristicsRepository')->insertIntoTable([
-                    'product_id' => $productId,
-                    'characteristic_id' => $characteristicId,
-                    'value' => ucfirst($value[$key]),
-                ]);
-            }
-        } else {
+        if (!empty($errors)) {
             $request->writeToSession('errors', $errors);
             $request->writeToSession('productData', $productData);
+            $this->redirect('view?id=' . $id);
         }
+        $request->removeFromSession('productData');
+        $request->removeFromSession('errors');
+        $image = $request->getFilesData('photo')["name"];
+        $request->writeToSession('image', $image);
+        $this->insertProductIntoTable($id, $productData, $image);
+        $characteristics = $productData['characteristic'];
+        $value = $productData['value'];
+        $productId = AppContainer::get('productRepository')
+            ->selectColumnFromTable('id_produs', 'title', $productData['title'])[0]['id_produs'];
+        $this->insertCharacteristics($characteristics, $value, $productId);
         $products = AppContainer::get('productRepository')->selectByFieldFromTable('id_user', $id);
-
         $viewParameters['products'] = $products;
         $this->redirect('view?id=' . $id);
     }
@@ -69,7 +96,6 @@ class ProductController extends GeneralController
         $viewParameters = $request->getSession();
         $viewParameters['product'] = $product;
         $request->writeToSession('product', $product);
-
         $viewParameters['pageTitle'] = $this->getTitle("Update Product");
         $this->checkUserAccess($request);
         return Response::view('update_product', $viewParameters);
@@ -79,63 +105,43 @@ class ProductController extends GeneralController
     {
         $idUser = $request->getSession()["user"]->id;
         $id = $request->getSession()['product']->id_produs;
+        $photo = null;
         if (!empty($request->getSession()["product"])) {
-            $productData = $request->getFormData();
+            $productData = $this->trimProductData($request->getFormData());
             $viewParameters = $request->getSession();
-            $productData['title'] = trim($productData['title']);
-            $productData['price'] = trim($productData['price']);
-            $productData['description'] = trim($productData['description']);
-            $pos = strpos(Request::uri(), "updateProduct");
+            //$pos = strpos(Request::uri(), "updateProduct");
             $photo = $request->getFilesData('photo')['name'];
-            if ($photo != null || $pos != false) {
-                $errors = (new ValidatorProduct())->validate($productData, $request);
-            }
-            if ($photo == null && $pos != false) {
-                $photo = $request->getSession()['product']->photo;
-                $errors = (new ValidatorProduct())->validateUpdate($productData, $request);
-            }
-
-            if (empty($errors)) {
-                AppContainer::get('productRepository')->updateTable($id, [
-                    'id_user' => $idUser,
-                    'title' => $productData['title'],
-                    'price' => $productData['price'],
-                    'description' => strip_tags($productData['description']),
-                    'photo' => $photo,
-
-                ]);
-
-                $request->removeFromSession('errors');
-                if (strcmp($request->getSession()['uri'], 'iMAG/view') == 0) {
-                    $this->redirect('view?' . $request->getSession()['query']);
-                }
-                if (strcmp($request->getSession()['uri'], 'iMAG') == 0) {
-                    $this->redirect('?' . $request->getSession()['query']);
-                }
-
-
-                $request->removeFromSession('query');
-                $image = $request->getFilesData('photo')["name"];
-                $viewParameters['image'] = $image;
-
-            } else {
-                $request->writeToSession('errors', $errors);
-                $request->writeToSession('formData', $productData);
-                $this->redirect('updateProduct?id=' . $id);
-            }
-
-            $this->checkUserAccess($request);
         }
+        if ($photo == null) {
+            $photo = $request->getSession()['product']->photo;
+            $errors = (new ValidatorProduct())->validateUpdate($productData, $request);
+        } else {
+            $errors = (new ValidatorProduct())->validate($productData, $request);
+        }
+        if (!empty($errors)) {
+            $request->writeToSession('errors', $errors);
+            $request->writeToSession('formData', $productData);
+            $this->redirect('updateProduct?id=' . $id);
+        }
+        $this->updateProductIntoTable($id, $idUser, $productData, $photo);
+        $request->removeFromSession('errors');
+        if (strcmp($request->getSession()['uri'], 'iMAG/view') == 0) {
+            $this->redirect('view?' . $request->getSession()['query']);
+        }
+        if (strcmp($request->getSession()['uri'], 'iMAG') == 0) {
+            $this->redirect('?' . $request->getSession()['query']);
+        }
+        $request->removeFromSession('query');
+        $image = $request->getFilesData('photo')["name"];
+        $viewParameters['image'] = $image;
+        $this->checkUserAccess($request);
     }
 
     public function viewProduct(Request $request)
     {
         $productId = $request->getQuery()['id'];
-
         $viewParameters = $request->getSession();
         $viewParameters['pageTitle'] = $this->getTitle("View Product");
-
-
         if (!preg_match('/^[0-9]+$/', $productId)) {
             $request->writeToSession('errors', ["Id-ul nu este numar!"]);
             $this->redirect('');
@@ -154,7 +160,6 @@ class ProductController extends GeneralController
         $userOfProduct = AppContainer::get('productRepository')->join2tables('users.username', 'users.firstname', 'users', 'products', 'users.id',
             'products.id_user', 'id_produs', $productId)[0];
         $viewParameters['userOfProduct'] = $userOfProduct;
-
         return Response::view('view_product', $viewParameters);
     }
 

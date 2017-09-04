@@ -1,8 +1,11 @@
 <?php
+
 namespace Src\Controllers;
+
 use App\AppContainer;
 use App\Request;
 use App\Response;
+
 class DefaultController extends GeneralController
 {
     public function index(Request $request)
@@ -12,14 +15,12 @@ class DefaultController extends GeneralController
             $request,
             $productRepository->countAll()
         );
-        $viewParameters = array_merge($request->getSession(),$this->configPagination($perPage,$currentPage,$totalPages,
-            $previous,$next));
+        $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
+            $previous, $next, $this->getTitle("iMAG"), '/iMAG'));
         if (isset($request->getSession()['user'])) {
             $viewParameters['esteLogat'] = 'Este Logat!';
         }
         $viewParameters['filterDates'] = [];
-        $viewParameters['pageTitle'] = $this->getTitle("iMAG");
-        $viewParameters['pageURL'] = '/iMAG';
         $viewParameters['query'] = $request->giveTheQuery();
         $request->writeToSession('uri', Request::uri());
         $request->writeToSession('query', $request->giveTheQuery());
@@ -34,6 +35,7 @@ class DefaultController extends GeneralController
         $viewParameters['characteristics'] = $characteristics;
         return Response::view('index', $viewParameters);
     }
+
     public function filters(Request $request)
     {
         $viewParameters = $request->getSession();
@@ -66,9 +68,10 @@ class DefaultController extends GeneralController
         $viewParameters['characteristics'] = $characteristics;
         return Response::view('filters_products', $viewParameters);
     }
+
     public function getCheckedFilters($filterDates)
     {
-        $params=[];
+        $params = [];
         if (!empty($filterDates['price'])) {
             $arrayPrices = [];
             $prices = $filterDates['price'];
