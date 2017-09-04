@@ -106,6 +106,13 @@ class ProductRepository extends QueryBuilder
         $this->updatee(self::TABLE, $id, $values);
     }
 
+//    public function countsProductsFiltered()
+//    {
+//        $str = "SELECT COUNT (*) FROM " . self::TABLE;
+//
+//        $str.="WHERE {$field}={$value}";
+//    }
+
     public function getProductsFiltered($params = [], $offset = 0, $limit = 10)
     {
         $str = "SELECT * FROM " . self::TABLE;

@@ -29,39 +29,44 @@ class UsersController extends GeneralController
 
     public function viewUser(Request $request)
     {
-        if (!empty($request->getSession()["user"])) {
-            $id = $request->getQuery()['id'];
-            $userRepository = AppContainer::get('userRepository');
-            if (!preg_match('/^[0-9]+$/', $id)) {
-                $request->writeToSession('errors', ["Id-ul nu este nr !"]);
-                $this->redirect('tableUsers');
-            }
-            $productRepository = AppContainer::get('productRepository');
+        if (empty($request->getSession()["user"])) {
+            $this->checkUserAccess($request);
+        }
+        $id = $request->getQuery()['id'];
+        $userRepository = AppContainer::get('userRepository');
+        if (!preg_match('/^[0-9]+$/', $id)) {
+            $request->writeToSession('errors', ["Id-ul nu este nr !"]);
+            $this->redirect('tableUsers');
+        }
+        $productRepository = AppContainer::get('productRepository');
 
-            list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
-                $request,
-                $productRepository->countAllWhereCondition('id_user', $id)
-            );
-            $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
-                $previous, $next, $this->getTitle("View User"), '/iMAG/view?id=' . $id));
-            $viewParameters['query'] = $request->giveTheQuery();
-            $products = $productRepository->getSubsetCondition('id_user', $id, $perPage * ($currentPage - 1), $perPage);
-            $viewParameters['products'] = $products;
-            $characteristicsRepository = AppContainer::get('characteristicsRepository');
-            $characteristics = $characteristicsRepository->selectAllFromTable();
-            $request->writeToSession('characteristics', $characteristics);
-            $users = $userRepository->selectByFieldFromTable('id', $id);
-            if (!empty($users)) {
-                $user = $users[0];
-                $viewParameters['userById'] = $user;
-                $request->writeToSession('uri', Request::uri());
-                $request->writeToSession('query', $request->giveTheQuery());
-                return Response::view('view_user', $viewParameters);
-            }
+        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
+            $request,
+            $productRepository->countAllWhereCondition('id_user', $id)
+        );
+        $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
+            $previous, $next, $this->getTitle("View User"), '/iMAG/view?id=' . $id));
+        $viewParameters['query'] = $request->giveTheQuery();
+        $products = $productRepository->getSubsetCondition('id_user', $id, $perPage * ($currentPage - 1), $perPage);
+        $viewParameters['products'] = $products;
+        $characteristicsRepository = AppContainer::get('characteristicsRepository');
+        $characteristics = $characteristicsRepository->selectAllFromTable();
+        $request->writeToSession('characteristics', $characteristics);
+        $users = $userRepository->selectByFieldFromTable('id', $id);
+        if (empty($users)) {
             $request->writeToSession('errors', ["Id-ul nu se gaseste in baza de date !"]);
             $this->redirect('tableUsers');
         }
-        $this->checkUserAccess($request);
+        $request->removeFromSession('errors');
+        $user = $users[0];
+        $viewParameters['userById'] = $user;
+
+        $viewParameters['userById'] = $user;
+        $request->writeToSession('uri', Request::uri());
+        $request->writeToSession('query', $request->giveTheQuery());
+        return Response::view('view_user', $viewParameters);
+
+
     }
 
     public function deleteUser(Request $request)

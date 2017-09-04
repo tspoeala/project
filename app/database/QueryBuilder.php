@@ -173,7 +173,7 @@ class QueryBuilder
         $statement = $this->pdo->prepare("select * from {$table} ORDER BY {$id} DESC limit {$offset}, $limit");
 
         $statement->execute();
-        return $statement->fetchAll(PDO::FETCH_CLASS);
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
 
     }
 

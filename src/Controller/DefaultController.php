@@ -66,7 +66,7 @@ class DefaultController extends GeneralController
             'products_characteristics cp', 'c.id', 'cp.characteristic_id');
         sort($characteristics);
         $viewParameters['characteristics'] = $characteristics;
-        return Response::view('filters_products', $viewParameters);
+        return Response::view('filters_products', $viewParameters);//trebuie schimbat cu index
     }
 
     public function getCheckedFilters($filterDates)
