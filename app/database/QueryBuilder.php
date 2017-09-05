@@ -13,10 +13,16 @@ class QueryBuilder
         $this->pdo = $pdo;
     }
 
+
+    public function getInitialQuery($table)
+    {
+        $initialQuery = "select * from {$table}";
+        return $initialQuery;
+    }
+
     public function selectAll($table)
     {
-
-        $statement = $this->pdo->prepare("select * from {$table}");
+        $statement = $this->pdo->prepare($this->getInitialQuery($table));
 
         $statement->execute();
 

@@ -3,6 +3,7 @@ function filterIsSet($field, $filter, $filterData)
 {
     return isset($filterData) && array_key_exists($field, $filterData) && in_array($filter, $filterData[$field]);
 }
+
 ?>
 
 <div class="col-xs-3 col-sm-3">

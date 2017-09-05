@@ -57,15 +57,19 @@ class CartController
     {
         $viewParameters = $request->getSession();
         $viewParameters['pageTitle'] = 'View Cart';
-        $cart = $viewParameters['cart'];
+        if (array_key_exists('cart', $viewParameters)) {
+            $cart = $viewParameters['cart'];
+        }
         /** @var ProductRepository $productRepo */
         $productRepo = AppContainer::get('productRepository');
         $products = [];
-        foreach ($cart as $idCart) {
-            $product = $productRepo->selectByFieldFromTable('id_produs', $idCart)[0];
-            $products[] = $product;
+        if (!empty($cart)) {
+            foreach ($cart as $idCart) {
+                $product = $productRepo->selectByFieldFromTable('id_produs', $idCart)[0];
+                $products[] = $product;
+            }
+            $viewParameters['products'] = $products;
         }
-        $viewParameters['products'] = $products;
         return Response::view('view_cart', $viewParameters);
     }
 }
