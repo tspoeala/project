@@ -5,7 +5,7 @@
 
     <!-- Products -->
     <div class="col-sm-6 col-lg-6 col-md-6">
-        <img src="src/Resources/images/<?php echo $product->photo; ?>" width="75%" height="75%" alt="">
+        <img src="src/Resources/images/<?php echo $product->photo; ?>" width="75%" height="75%" alt="The photo can't view">
 
 
         <table class="table">
@@ -52,9 +52,9 @@
                     </tr>
 
 
-                <?php }
-            } ?>
-            <?php if (isset($user)) { ?>
+                <?php } ?>
+            <?php } ?>
+            <?php if (isset($user) && $product->id_user != $user->id) { ?>
 
                 <tr>
                     <td></td>
@@ -71,8 +71,6 @@
             </tbody>
         </table>
     </div>
-
-
 
 
     <script

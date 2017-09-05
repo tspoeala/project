@@ -43,8 +43,7 @@ class ValidatorProduct
                 $this->errors['size'] = 'File size must be excately 2 MB';
             }
 
-
-            if (empty($errors)) {
+            if (empty($this->errors)) {
                 move_uploaded_file($fileTmp, "src/Resources/images/" . $fileName);
             }
         }
@@ -54,7 +53,7 @@ class ValidatorProduct
     {
         $file_name = $request->getFilesData('photo')['name'];
         $file_tmp = $request->getFilesData('photo')['tmp_name'];
-        if (empty($errors) == true) {
+        if (empty($errors)) {
             move_uploaded_file($file_tmp, "src/Resources/images/" . $file_name);
         }
     }
@@ -101,7 +100,7 @@ class ValidatorProduct
         if ($this->array_has_dupes($productData['characteristic'])) {
             $this->errors['dupes'] = "You choose the same characteristic more times!";
         }
-        //return $this->errors;
+
 
 
     }
@@ -121,7 +120,6 @@ class ValidatorProduct
             return $this->errors;
         }
 
-        //
         $this->validateCharacteristics($productData);
         return $this->errors;
 

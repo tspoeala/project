@@ -33,7 +33,7 @@ class GeneralController
         return md5($password);
     }
 
-    protected function getTitle($title="Im awesome!")
+    protected function getTitle($title = "Im awesome!")
     {
         return $title;
     }
@@ -55,7 +55,6 @@ class GeneralController
                 $currentPage = 1;
             }
         }
-
         $previous = 1;
         $next = $totalPages;
         if ($currentPage > 1) {
@@ -67,13 +66,15 @@ class GeneralController
         return array($perPage, $currentPage, $totalPages, $previous, $next);
     }
 
-    public function configPagination($perPage,$currentPage,$totalPages,$previous,$next)
+    public function configPagination($perPage, $currentPage, $totalPages, $previous, $next, $pageTitle, $pageURL)
     {
         $viewParameters['perPage'] = $perPage;
         $viewParameters['currentPage'] = $currentPage;
         $viewParameters['totalPages'] = $totalPages;
         $viewParameters['previous'] = $previous;
         $viewParameters['next'] = $next;
+        $viewParameters['pageTitle'] = $pageTitle;
+        $viewParameters['pageURL'] = $pageURL;
         return $viewParameters;
 
     }

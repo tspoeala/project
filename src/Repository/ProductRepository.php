@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: teodora.spoeala
- * Date: 8/2/2017
- * Time: 10:58 AM
- */
 
 namespace Src\Repository;
 
@@ -112,7 +106,14 @@ class ProductRepository extends QueryBuilder
         $this->updatee(self::TABLE, $id, $values);
     }
 
-    public function getProductsFiltered($params=[], $offset=0, $limit=10)
+//    public function countsProductsFiltered()
+//    {
+//        $str = "SELECT COUNT (*) FROM " . self::TABLE;
+//
+//        $str.="WHERE {$field}={$value}";
+//    }
+
+    public function getProductsFiltered($params = [], $offset = 0, $limit = 10)
     {
         $str = "SELECT * FROM " . self::TABLE;
         $prices = [];
@@ -121,6 +122,41 @@ class ProductRepository extends QueryBuilder
             unset($params['arrayPrices']);
         }
 
+        $str .= $this->getFilters($params);
+        $str .= " WHERE 1";
+        $str .= $this->getPrices($prices);
+
+        //$str .= " ORDER BY " . self::ID . " DESC limit {$offset}, {$limit}";
+
+        $statement = $this->pdo->prepare($str);
+
+        $statement->execute();
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getPrices($prices)
+    {
+        $str = "";
+        if (!empty($prices)) {
+            $str .= " AND (";
+
+            for ($i = 0; $i < count($prices); $i++) {
+                $price = $prices[$i];
+                $str .= self::TABLE . " . price BETWEEN $price[0] AND $price[1]";
+                if ($i < count($prices) - 1) {
+                    $str .= " OR ";
+                }
+            }
+            $str .= ")";
+
+        }
+        return $str;
+    }
+
+    public function getFilters($params)
+    {
+        $str = "";
         foreach ($params as $key => $param) {
             $str .= " INNER JOIN " . self::TABLEPIVOT .
                 " pc$key ON " . self::TABLE . ".id_produs= pc$key.product_id ";
@@ -171,26 +207,6 @@ class ProductRepository extends QueryBuilder
                 $str .= ')';
             }
         }
-        $str .= " WHERE 1";
-        if (!empty($prices)) {
-            $str .= " AND (";
-
-            for ($i = 0; $i < count($prices); $i++) {
-                $price = $prices[$i];
-                $str .= self::TABLE . " . price BETWEEN $price[0] AND $price[1]";
-                if ($i < count($prices) - 1) {
-                    $str .= " OR ";
-                }
-            }
-            $str .= ")";
-
-        }
-        $str.= " ORDER BY ".self::ID." DESC limit {$offset}, {$limit}";
-
-        $statement = $this->pdo->prepare($str);
-
-        $statement->execute();
-
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        return $str;
     }
 }

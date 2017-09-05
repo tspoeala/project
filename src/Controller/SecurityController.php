@@ -32,7 +32,7 @@ class SecurityController extends GeneralController
 
     public function register(Request $request)
     {
-        $request->writeToSession('pageTitle',"Register");
+        $request->writeToSession('pageTitle', "Register");
         if (isset($request->getSession()["user"])) {
             $this->redirect('tableUsers');
         }
@@ -46,24 +46,27 @@ class SecurityController extends GeneralController
         return $response;
     }
 
+    public function insertUserIntoTable($userData)
+    {
+        AppContainer::get('userRepository')->insertIntoTable([
+            'firstname' => $userData['first_name'],
+            'lastname' => $userData['last_name'],
+            'username' => $userData['display_name'],
+            'email' => $userData['email'],
+            'password' => $this->encryptPassword($userData['password']),
+
+        ]);
+    }
+
     public function saveUser(Request $request)//saveUser
     {
-
         $userData = $request->getFormData();
         $errors = (new ValidatorRegister())->validate($userData);
         if (!empty($errors)) {
-
             $request->writeToSession('errors', $errors);
             $request->writeToSession('formData', $userData);
         } else {
-            AppContainer::get('userRepository')->insertIntoTable([
-                'firstname' => $userData['first_name'],
-                'lastname' => $userData['last_name'],
-                'username' => $userData['display_name'],
-                'email' => $userData['email'],
-                'password' => $this->encryptPassword($userData['password']),
-
-            ]);
+            $this->insertUserIntoTable($userData);
             $request->removeFromSession('errors');
             $request->writeToSession('success', 'User registered!');
         }
@@ -86,13 +89,12 @@ class SecurityController extends GeneralController
             $this->checkUserAccess($request);
         }
         $user = reset($result);
-        $user->cart = [];
         $request->writeToSession('email', $email);
         $password = $this->encryptPassword($userData['password']);
         if ($user->password == $password) {
             $request->removeFromSession('errors');
             $request->writeToSession('user', $user);
-            $this->redirect('tableUsers');
+            $this->redirect('');
         }
         $request->writeToSession('errors', [" Wrong password!"]);
         $this->checkUserAccess($request);
