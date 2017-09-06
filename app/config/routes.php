@@ -34,7 +34,7 @@ $router->get('iMAG/viewProduct', 'ProductController:viewProduct');
 
 $router->get('iMAG/search', 'ProductController:searchProduct');
 
-$router->post("iMAG", 'DefaultController:index');
+//$router->post("iMAG", 'DefaultController:index');
 
 $router->post('iMAG/addToCart', 'CartController:add');
 

@@ -11,17 +11,12 @@ class DefaultController extends GeneralController
     public function index(Request $request)
     {
         $productRepository = AppContainer::get('productRepository');
-        $filterDates = $request->getFormData();
-        //unset($filterDates['submit']);
+        $filterDates = $request->getQuery();
         $params = $this->getCheckedFilters($filterDates);
         list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
             $request,
             $productRepository->countProductsFiltered($params)
         );
-//        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
-//            $request,
-//            $productRepository->countAll()
-//        );
         $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
             $previous, $next, $this->getTitle("iMAG"), '/iMAG'));
         if (isset($request->getSession()['user'])) {
@@ -31,12 +26,6 @@ class DefaultController extends GeneralController
         $products = $productRepository->getProductsFiltered($params, $offset, $perPage);
         $viewParameters['filterDates'] = $filterDates;
         $viewParameters['query'] = $request->giveTheQuery();
-        $request->writeToSession('uri', Request::uri());
-        $viewParameters['method'] = Request::method();
-        //$request->writeToSession('query', $request->giveTheQuery());
-        $viewParameters['query'] = $request->giveTheQuery();
-        //$offset = $perPage * ($currentPage - 1);
-        // $products = $productRepository->getSubsetOrderBy($offset, $perPage);
         $viewParameters['products'] = $products;
         $request->removeFromSession('errors');
         $characteristicRepository = AppContainer::get('characteristicsRepository');
@@ -46,37 +35,6 @@ class DefaultController extends GeneralController
         $viewParameters['characteristics'] = $characteristics;
         return Response::view('index', $viewParameters);
     }
-
-//    public function filters(Request $request)
-//    {
-//        $productRepository = AppContainer::get('productRepository');
-//        $filterDates = $request->getFormData();
-//        unset($filterDates['submit']);
-////        if (empty($filterDates)) {
-////            $this->redirect('');
-////        }
-//
-//        $params = $this->getCheckedFilters($filterDates);
-//        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
-//            $request,
-//            $productRepository->countProductsFiltered($params)
-//        );
-//
-//        $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
-//            $previous, $next, $this->getTitle("Filtrare produse"), '/iMAG'));
-//        $offset = $perPage * ($currentPage - 1);
-//        $products = $productRepository->getProductsFiltered($params, $offset, $perPage);
-//        $viewParameters['filterDates'] = $filterDates;
-//        $viewParameters['method'] = Request::method();
-//        $viewParameters['query'] = $request->giveTheQuery();
-//        $viewParameters['products'] = $products;
-//        $characteristicRepository = AppContainer::get('characteristicsRepository');
-//        $characteristics = $characteristicRepository->join2tablesLike('c.name', 'cp.value', 'characteristics c',
-//            'products_characteristics cp', 'c.id', 'cp.characteristic_id');
-//        sort($characteristics);
-//        $viewParameters['characteristics'] = $characteristics;
-//        return Response::view('filters_products', $viewParameters);//trebuie schimbat cu index
-//    }
 
     public function getCheckedFilters($filterDates)
     {

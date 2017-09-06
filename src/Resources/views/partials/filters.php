@@ -12,7 +12,7 @@ function filterIsSet($field, $filter, $filterData)
             <h3 class="panel-title">Filter de cautare</h3>
         </div>
 
-        <form action="" method="post">
+        <form action="" method="get">
             <div class="panel-body">
                 <div class="panel-heading ">
                     <h4 class="panel-title">
