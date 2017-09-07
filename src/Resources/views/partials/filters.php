@@ -7,7 +7,7 @@ function filterIsSet($field, $filter, $filterData)
 ?>
 
 <div class="col-xs-3 col-sm-3">
-    <div id="accordion" class="panel panel-primary behclick-panel">
+    <div id="accordion" style="min-height: 1000px" class="panel panel-primary behclick-panel">
         <div class="panel-heading">
             <h3 class="panel-title">Filter de cautare</h3>
         </div>

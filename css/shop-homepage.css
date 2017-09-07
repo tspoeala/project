@@ -34,7 +34,8 @@
 
 .thumbnail {
     padding: 0;
-    height: 400px;
+    height: 350px;
+    /*width: 350px;*/
 
 }
 
@@ -51,3 +52,4 @@
 footer {
     margin: 50px 0;
 }
+
