@@ -26,6 +26,8 @@ class DefaultController extends GeneralController
         $products = $productRepository->getProductsFiltered($params, $offset, $perPage);
         $viewParameters['filterDates'] = $filterDates;
         $viewParameters['query'] = $request->giveTheQuery();
+        $request->writeToSession('uri', Request::uri());
+        $request->writeToSession('query', $request->giveTheQuery());
         $viewParameters['products'] = $products;
         $request->removeFromSession('errors');
         $characteristicRepository = AppContainer::get('characteristicsRepository');
@@ -40,31 +42,32 @@ class DefaultController extends GeneralController
     {
         $params = [];
         if (!empty($filterDates['price'])) {
-            $arrayPrices = [];
-            $prices = $filterDates['price'];
-            foreach ($prices as $key => $price) {
-                $explode = explode('-', $price);
-                $result = [0 => $explode[0], 1 => $explode[1]];
-                $arrayPrices[$key] = $result;
-            }
-            $params['arrayPrices'] = $arrayPrices;
+            $params['arrayPrices'] = $this->getArrayPrices($filterDates);
         }
         if (!empty($filterDates['nrArzatoare'])) {
-            $nrArzatoare = $filterDates['nrArzatoare'];
-            $params['nrArzatoare'] = $nrArzatoare;
+            $params['nrArzatoare'] = $filterDates['nrArzatoare'];
         }
         if (!empty($filterDates['alimentarePlita'])) {
-            $alimentarePlita = $filterDates['alimentarePlita'];
-            $params['alimentarePlita'] = $alimentarePlita;
+            $params['alimentarePlita'] = $filterDates['alimentarePlita'];
         }
-        if (!empty($filterDates['culoare'])) {
-            $culori = $filterDates['culoare'];
-            $params['culori'] = $culori;
+        if (!empty($filterDates['culori'])) {
+            $params['culori'] = $filterDates['culori'];
         }
         if (!empty($filterDates['aprindereElectrica'])) {
-            $aprindereElectrica = $filterDates['aprindereElectrica'];
-            $params['aprindereElectrica'] = $aprindereElectrica;
+            $params['aprindereElectrica'] = $filterDates['aprindereElectrica'];
         }
         return $params;
+    }
+
+    public function getArrayPrices($filterDates)
+    {
+        $arrayPrices = [];
+        $prices = $filterDates['price'];
+        foreach ($prices as $key => $price) {
+            $explode = explode('-', $price);
+            $result = [0 => $explode[0], 1 => $explode[1]];
+            $arrayPrices[$key] = $result;
+        }
+        return $arrayPrices;
     }
 }

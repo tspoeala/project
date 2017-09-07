@@ -128,6 +128,7 @@ class ProductController extends GeneralController
         if (strcmp($request->getSession()['uri'], 'iMAG/view') == 0) {
             $this->redirect('view?' . $request->getSession()['query']);
         }
+
         if (strcmp($request->getSession()['uri'], 'iMAG') == 0) {
             $this->redirect('?' . $request->getSession()['query']);
         }

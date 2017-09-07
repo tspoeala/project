@@ -132,9 +132,9 @@ function filterIsSet($field, $filter, $filterData)
                                 <li class="list-group-item">
                                     <div class="checkbox">
                                         <label>
-                                            <input type="checkbox" name="culoare[]"
+                                            <input type="checkbox" name="culori[]"
                                                    value="<?php echo $characteristic['value'] ?>"
-                                                <?php if (filterIsSet('culoare', $characteristic['value'], $filterDates)) { ?>
+                                                <?php if (filterIsSet('culori', $characteristic['value'], $filterDates)) { ?>
                                                     checked
                                                 <?php } ?>>
                                             <?php echo $characteristic['value'] ?>
