@@ -68,9 +68,20 @@ class ProductRepository extends QueryBuilder
         return $this->selectByFieldBetween(self::TABLE, $field, $value1, $value2);
     }
 
-    public function selectByFieldLikeFromTable($field, $value)
+    public function selectByFieldLikeFromTable($field, $value, $offset, $limit)
     {
-        return $this->selectByFieldLike(self::TABLE, $field, $value);
+        return $this->selectByFieldLike(self::TABLE, $field, $value, self::ID, $offset, $limit);
+    }
+
+    public function countSelectByFieldLikeFromTable($field, $value)
+    {
+        return $this->countSelectByFieldLike(self::TABLE, $field, $value);
+    }
+
+    public function getUserOfProduct($productId)
+    {
+        return $this->join2tables('users.username', 'users.firstname', 'users', 'products', 'users.id',
+            'products.id_user', 'id_produs', $productId)[0];
     }
 
     public function deleteFromTable($field, $value)

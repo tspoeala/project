@@ -39,11 +39,7 @@
             <td>
             <th>Role</th>
             </td>
-            <td><?php if ($userById->admin) {
-                    echo 'admin';
-                } else {
-                    echo 'user';
-                } ?>
+            <td><?php echo ($userById->admin) ? 'admin' : 'user'; ?>
             </td>
         </tr>
 
@@ -158,10 +154,8 @@
                 <option value disabled="disabled" selected="selected">Please select a category...
                 </option>
                 <?php foreach ($characteristics as $characteristic) { ?>
-                    <option value="<?php echo $characteristic['id'];
-                    ?>">
-                        <?php echo $characteristic['name'];
-                        ?></option>
+                    <option value="<?php echo $characteristic['id'] ?>">
+                        <?php echo $characteristic['name'] ?></option>
                 <?php } ?>
             </select>
         </div>

@@ -5,15 +5,19 @@ namespace Src\Controllers;
 use App\AppContainer;
 use App\Request;
 use App\Response;
+use Src\Repository\ProductRepository;
 
 class DefaultController extends GeneralController
 {
     public function index(Request $request)
     {
+        /**
+         * @var ProductRepository $productRepository
+         */
         $productRepository = AppContainer::get('productRepository');
         $filterDates = $request->getQuery();
         $params = $this->getCheckedFilters($filterDates);
-        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
+        list($perPage, $currentPage, $totalPages, $previous, $next, $offset) = $this->pagination(
             $request,
             $productRepository->countProductsFiltered($params)
         );
@@ -22,7 +26,6 @@ class DefaultController extends GeneralController
         if (isset($request->getSession()['user'])) {
             $viewParameters['esteLogat'] = 'Este Logat!';
         }
-        $offset = $perPage * ($currentPage - 1);
         $products = $productRepository->getProductsFiltered($params, $offset, $perPage);
         $viewParameters['filterDates'] = $filterDates;
         $viewParameters['query'] = $request->giveTheQuery();

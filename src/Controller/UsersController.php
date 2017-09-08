@@ -14,13 +14,13 @@ class UsersController extends GeneralController
     {
         $this->checkUserAccess($request);
         $userRepository = AppContainer::get('userRepository');
-        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
+        list($perPage, $currentPage, $totalPages, $previous, $next, $offset) = $this->pagination(
             $request,
             $userRepository->countAll()
         );
         $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
             $previous, $next, $this->getTitle('Users'), '/iMAG/tableUsers'));
-        $users = $userRepository->getSubset($perPage * ($currentPage - 1), $perPage);
+        $users = $userRepository->getSubset($offset, $perPage);
         $viewParameters['users'] = $users;
         $viewParameters['query'] = $request->giveTheQuery();
         $request->writeToSession('query', $request->giveTheQuery());
@@ -40,14 +40,14 @@ class UsersController extends GeneralController
         }
         $productRepository = AppContainer::get('productRepository');
 
-        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
+        list($perPage, $currentPage, $totalPages, $previous, $next, $offset) = $this->pagination(
             $request,
             $productRepository->countAllWhereCondition('id_user', $id)
         );
         $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
             $previous, $next, $this->getTitle("View User"), '/iMAG/view?id=' . $id));
         $viewParameters['query'] = $request->giveTheQuery();
-        $products = $productRepository->getSubsetCondition('id_user', $id, $perPage * ($currentPage - 1), $perPage);
+        $products = $productRepository->getSubsetCondition('id_user', $id, $offset, $perPage);
         $viewParameters['products'] = $products;
         $characteristicsRepository = AppContainer::get('characteristicsRepository');
         $characteristics = $characteristicsRepository->selectAllFromTable();
@@ -59,8 +59,6 @@ class UsersController extends GeneralController
         }
         $request->removeFromSession('errors');
         $user = $users[0];
-        $viewParameters['userById'] = $user;
-
         $viewParameters['userById'] = $user;
         $request->writeToSession('uri', Request::uri());
         $request->writeToSession('query', $request->giveTheQuery());

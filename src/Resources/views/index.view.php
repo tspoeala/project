@@ -4,7 +4,6 @@
     <?php require('partials/errors.php'); ?>
     <h1>All products</h1>
 
-
     <div class="row">
         <?php require('partials/filters.php'); ?>
 
@@ -21,8 +20,7 @@
                     </a>
 
                     <?php if (isset($esteLogat) && ($user->admin != 0 || $product['id_user'] == $user->id)) { ?>
-                        <a href="/iMAG/updateProduct?id=<?php echo $product['id_produs']; ?>">Update
-                            Product
+                        <a href="/iMAG/updateProduct?id=<?php echo $product['id_produs']; ?>">Update Product
                         </a>
                     <?php } ?>
 
@@ -32,9 +30,7 @@
     </div>
 
 </div>
-
 <?php require 'partials/pagination.php'; ?>
-
 <?php require('partials/footer.php'); ?>
 
 

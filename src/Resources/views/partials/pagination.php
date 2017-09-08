@@ -1,19 +1,18 @@
+<?php function setQuery($query, $pageURL, $filterDates, $page)
+{
+    if (strpos($query, 'page')) {
+        $query = substr($query, 0, strpos($query, '&page'));
+    }
+    echo (strpos($query, 'id') === false && strpos($query, 'name') === false) ? (isset($filterDates['submit']) ? $pageURL . "?$query&page=" . $page :
+        $pageURL . "?page=" . $page) : $pageURL . '&page=' . $page;
+} ?>
 <div class="container">
     <ul class="pagination">
-        <?php function setQuery($query, $pageURL, $filterDates, $page)
-        {
-            if (strpos($query, 'page')) {
-                $query = substr($query, 0, strpos($query, '&page'));
-            }
-            echo (strpos($query, 'id') === false) ? (isset($filterDates['submit']) ? $pageURL . "?$query&page=" . $page :
-                $pageURL . "?page=" . $page) : $pageURL . '&page=' . $page;
-        } ?>
         <?php if ($currentPage != 1) { ?>
             <li class="page-item">
                 <a class="page-link"
                    href="
-                   <?php setQuery($query, $pageURL, $filterDates, $previous) ?>">
-                    Prev
+                   <?php setQuery($query, $pageURL, $filterDates, $previous) ?>">Prev
                 </a>
             </li>
         <?php } ?>

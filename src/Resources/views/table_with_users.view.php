@@ -1,7 +1,6 @@
 <?php require('partials/header.php'); ?>
-
+<?php require('partials/errors.php'); ?>
 <div class="container top-item">
-    <?php require('partials/errors.php'); ?>
     <h1>Users</h1>
     <table class="table">
         <thead>
