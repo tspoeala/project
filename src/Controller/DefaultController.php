@@ -5,27 +5,32 @@ namespace Src\Controllers;
 use App\AppContainer;
 use App\Request;
 use App\Response;
+use Src\Repository\ProductRepository;
 
 class DefaultController extends GeneralController
 {
     public function index(Request $request)
     {
+        /**
+         * @var ProductRepository $productRepository
+         */
         $productRepository = AppContainer::get('productRepository');
-        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
+        $filterDates = $request->getQuery();
+        $params = $this->getCheckedFilters($filterDates);
+        list($perPage, $currentPage, $totalPages, $previous, $next, $offset) = $this->pagination(
             $request,
-            $productRepository->countAll()
+            $productRepository->countProductsFiltered($params)
         );
         $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
             $previous, $next, $this->getTitle("iMAG"), '/iMAG'));
         if (isset($request->getSession()['user'])) {
             $viewParameters['esteLogat'] = 'Este Logat!';
         }
-        $viewParameters['filterDates'] = [];
+        $products = $productRepository->getProductsFiltered($params, $offset, $perPage);
+        $viewParameters['filterDates'] = $filterDates;
         $viewParameters['query'] = $request->giveTheQuery();
         $request->writeToSession('uri', Request::uri());
         $request->writeToSession('query', $request->giveTheQuery());
-        $offset = $perPage * ($currentPage - 1);
-        $products = $productRepository->getSubsetOrderBy($offset, $perPage);
         $viewParameters['products'] = $products;
         $request->removeFromSession('errors');
         $characteristicRepository = AppContainer::get('characteristicsRepository');
@@ -36,68 +41,36 @@ class DefaultController extends GeneralController
         return Response::view('index', $viewParameters);
     }
 
-    public function filters(Request $request)
-    {
-        $viewParameters = $request->getSession();
-        $productRepository = AppContainer::get('productRepository');
-        $filterDates = $request->getFormData();
-        unset($filterDates['submit']);
-        if (empty($filterDates)) {
-            $this->redirect('');
-        }
-        $viewParameters['filterDates'] = $filterDates;
-        $params = $this->getCheckedFilters($filterDates);
-        $products = $productRepository->getProductsFiltered($params);
-        list($perPage, $currentPage, $totalPages, $previous, $next) = $this->pagination(
-            $request,
-            count($products)
-        );
-        $viewParameters['perPage'] = $perPage;
-        $viewParameters['currentPage'] = $currentPage;
-        $viewParameters['totalPages'] = $totalPages;
-        $viewParameters['previous'] = $previous;
-        $viewParameters['next'] = $next;
-        $viewParameters['pageURL'] = '/iMAG';
-        $viewParameters['query'] = $request->giveTheQuery();
-        $viewParameters['pageTitle'] = $this->getTitle("Filtrare produse");
-        $viewParameters['products'] = $products;
-        $characteristicRepository = AppContainer::get('characteristicsRepository');
-        $characteristics = $characteristicRepository->join2tablesLike('c.name', 'cp.value', 'characteristics c',
-            'products_characteristics cp', 'c.id', 'cp.characteristic_id');
-        sort($characteristics);
-        $viewParameters['characteristics'] = $characteristics;
-        return Response::view('filters_products', $viewParameters);//trebuie schimbat cu index
-    }
-
     public function getCheckedFilters($filterDates)
     {
         $params = [];
         if (!empty($filterDates['price'])) {
-            $arrayPrices = [];
-            $prices = $filterDates['price'];
-            foreach ($prices as $key => $price) {
-                $explode = explode('-', $price);
-                $result = [0 => $explode[0], 1 => $explode[1]];
-                $arrayPrices[$key] = $result;
-            }
-            $params['arrayPrices'] = $arrayPrices;
+            $params['arrayPrices'] = $this->getArrayPrices($filterDates);
         }
         if (!empty($filterDates['nrArzatoare'])) {
-            $nrArzatoare = $filterDates['nrArzatoare'];
-            $params['nrArzatoare'] = $nrArzatoare;
+            $params['nrArzatoare'] = $filterDates['nrArzatoare'];
         }
         if (!empty($filterDates['alimentarePlita'])) {
-            $alimentarePlita = $filterDates['alimentarePlita'];
-            $params['alimentarePlita'] = $alimentarePlita;
+            $params['alimentarePlita'] = $filterDates['alimentarePlita'];
         }
-        if (!empty($filterDates['culoare'])) {
-            $culori = $filterDates['culoare'];
-            $params['culori'] = $culori;
+        if (!empty($filterDates['culori'])) {
+            $params['culori'] = $filterDates['culori'];
         }
         if (!empty($filterDates['aprindereElectrica'])) {
-            $aprindereElectrica = $filterDates['aprindereElectrica'];
-            $params['aprindereElectrica'] = $aprindereElectrica;
+            $params['aprindereElectrica'] = $filterDates['aprindereElectrica'];
         }
         return $params;
+    }
+
+    public function getArrayPrices($filterDates)
+    {
+        $arrayPrices = [];
+        $prices = $filterDates['price'];
+        foreach ($prices as $key => $price) {
+            $explode = explode('-', $price);
+            $result = [0 => $explode[0], 1 => $explode[1]];
+            $arrayPrices[$key] = $result;
+        }
+        return $arrayPrices;
     }
 }

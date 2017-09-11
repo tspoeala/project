@@ -77,5 +77,12 @@ class ProductCharacteristicsRepository extends QueryBuilder
 
     }
 
+    public function getCharacteristics($productId)
+    {
+        return $this->join3tables('characteristics.name', 'products_characteristics.value',
+            'characteristics', 'products_characteristics', 'products', 'characteristics.id',
+            'products_characteristics.characteristic_id', 'products_characteristics.product_id', 'products.id_produs', 'id_produs', $productId);
+    }
+
 
 }

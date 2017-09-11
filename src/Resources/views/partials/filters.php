@@ -3,15 +3,16 @@ function filterIsSet($field, $filter, $filterData)
 {
     return isset($filterData) && array_key_exists($field, $filterData) && in_array($filter, $filterData[$field]);
 }
+
 ?>
 
 <div class="col-xs-3 col-sm-3">
-    <div id="accordion" class="panel panel-primary behclick-panel">
+    <div id="accordion" style="min-height: 1000px" class="panel panel-primary behclick-panel">
         <div class="panel-heading">
             <h3 class="panel-title">Filter de cautare</h3>
         </div>
 
-        <form action="" method="post">
+        <form action="" method="get">
             <div class="panel-body">
                 <div class="panel-heading ">
                     <h4 class="panel-title">
@@ -131,9 +132,9 @@ function filterIsSet($field, $filter, $filterData)
                                 <li class="list-group-item">
                                     <div class="checkbox">
                                         <label>
-                                            <input type="checkbox" name="culoare[]"
+                                            <input type="checkbox" name="culori[]"
                                                    value="<?php echo $characteristic['value'] ?>"
-                                                <?php if (filterIsSet('culoare', $characteristic['value'], $filterDates)) { ?>
+                                                <?php if (filterIsSet('culori', $characteristic['value'], $filterDates)) { ?>
                                                     checked
                                                 <?php } ?>>
                                             <?php echo $characteristic['value'] ?>

@@ -13,10 +13,16 @@ class QueryBuilder
         $this->pdo = $pdo;
     }
 
+
+    public function getInitialQuery($table)
+    {
+        $initialQuery = "select * from {$table}";
+        return $initialQuery;
+    }
+
     public function selectAll($table)
     {
-
-        $statement = $this->pdo->prepare("select * from {$table}");
+        $statement = $this->pdo->prepare($this->getInitialQuery($table));
 
         $statement->execute();
 
@@ -62,15 +68,24 @@ class QueryBuilder
         return $statement->fetchAll(PDO::FETCH_CLASS);
     }
 
-    public function selectByFieldLike($table, $field, $value)
+    public function countSelectByFieldLike($table, $field, $value)
     {
 
-        $sql = "SELECT * FROM  `$table` WHERE `$field` LIKE '%$value%'";
-
+        $sql = "SELECT COUNT(*) FROM  `$table` WHERE `$field` LIKE '%$value%'";
         $statement = $this->pdo->prepare($sql);
 
         $statement->execute();
 
+        return $statement->fetchColumn();
+    }
+
+
+    public function selectByFieldLike($table, $field, $value, $id, $offset, $limit)
+    {
+
+        $sql = "SELECT * FROM  `$table` WHERE `$field` LIKE '%$value%'  ORDER BY {$id}  DESC limit {$offset}, {$limit}";
+        $statement = $this->pdo->prepare($sql);
+        $statement->execute();
         return $statement->fetchAll(PDO::FETCH_CLASS);
     }
 

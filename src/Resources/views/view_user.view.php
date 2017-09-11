@@ -39,11 +39,7 @@
             <td>
             <th>Role</th>
             </td>
-            <td><?php if ($userById->admin) {
-                    echo 'admin';
-                } else {
-                    echo 'user';
-                } ?>
+            <td><?php echo ($userById->admin) ? 'admin' : 'user'; ?>
             </td>
         </tr>
 
@@ -129,17 +125,17 @@
 
             <?php foreach ($products as $product) { ?>
                 <div class="col-sm-4 col-lg-4 col-md-4">
-                    <div class="thumbnail">
-                        <a href="/iMAG/viewProduct?id=<?php echo $product->id_produs; ?>">
-                            <img src="src/Resources/images/<?php echo $product->photo; ?>">
-                            <div class="caption">
+                    <div class="thumbnail" style="height: 350px; width:350px;">
+                        <a style="margin: 10px;" href="/iMAG/viewProduct?id=<?php echo $product->id_produs; ?>">
+                            <img style="width: 174px; height: 174px;"
+                                 src="src/Resources/images/<?php echo $product->photo; ?>">
+                            <div class="caption" style="height: 100px;margin:10px;">
                                 <h4><?php echo $product->title; ?></h4>
                                 <h4><?php echo $product->price; ?> Lei</h4>
                             </div>
                         </a>
-
                         <?php if ($user->admin != 0 || $product->id_user == $user->id) { ?>
-                            <a href="/iMAG/updateProduct?id=<?php echo $product->id_produs; ?>">Update
+                            <a style="margin: 10px;" href="/iMAG/updateProduct?id=<?php echo $product->id_produs; ?>">Update
                                 Product
                             </a>
                         <?php } ?>
@@ -158,10 +154,8 @@
                 <option value disabled="disabled" selected="selected">Please select a category...
                 </option>
                 <?php foreach ($characteristics as $characteristic) { ?>
-                    <option value="<?php echo $characteristic['id'];
-                    ?>">
-                        <?php echo $characteristic['name'];
-                        ?></option>
+                    <option value="<?php echo $characteristic['id'] ?>">
+                        <?php echo $characteristic['name'] ?></option>
                 <?php } ?>
             </select>
         </div>

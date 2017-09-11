@@ -68,9 +68,20 @@ class ProductRepository extends QueryBuilder
         return $this->selectByFieldBetween(self::TABLE, $field, $value1, $value2);
     }
 
-    public function selectByFieldLikeFromTable($field, $value)
+    public function selectByFieldLikeFromTable($field, $value, $offset, $limit)
     {
-        return $this->selectByFieldLike(self::TABLE, $field, $value);
+        return $this->selectByFieldLike(self::TABLE, $field, $value, self::ID, $offset, $limit);
+    }
+
+    public function countSelectByFieldLikeFromTable($field, $value)
+    {
+        return $this->countSelectByFieldLike(self::TABLE, $field, $value);
+    }
+
+    public function getUserOfProduct($productId)
+    {
+        return $this->join2tables('users.username', 'users.firstname', 'users', 'products', 'users.id',
+            'products.id_user', 'id_produs', $productId)[0];
     }
 
     public function deleteFromTable($field, $value)
@@ -106,14 +117,8 @@ class ProductRepository extends QueryBuilder
         $this->updatee(self::TABLE, $id, $values);
     }
 
-//    public function countsProductsFiltered()
-//    {
-//        $str = "SELECT COUNT (*) FROM " . self::TABLE;
-//
-//        $str.="WHERE {$field}={$value}";
-//    }
 
-    public function getProductsFiltered($params = [], $offset = 0, $limit = 10)
+    public function getProductsFiltered($params = [], $offset, $limit)
     {
         $str = "SELECT * FROM " . self::TABLE;
         $prices = [];
@@ -126,13 +131,31 @@ class ProductRepository extends QueryBuilder
         $str .= " WHERE 1";
         $str .= $this->getPrices($prices);
 
-        //$str .= " ORDER BY " . self::ID . " DESC limit {$offset}, {$limit}";
-
+        $str .= " ORDER BY " . self::ID . " DESC limit {$offset}, {$limit}";
         $statement = $this->pdo->prepare($str);
 
         $statement->execute();
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countProductsFiltered($params = [])
+    {
+        $str = "SELECT COUNT(*) FROM " . self::TABLE;
+        $prices = [];
+        if (array_key_exists('arrayPrices', $params)) {
+            $prices = $params['arrayPrices'];
+            unset($params['arrayPrices']);
+        }
+
+        $str .= $this->getFilters($params);
+        $str .= " WHERE 1";
+        $str .= $this->getPrices($prices);
+        $statement = $this->pdo->prepare($str);
+
+        $statement->execute();
+
+        return $statement->fetchColumn();
     }
 
     public function getPrices($prices)

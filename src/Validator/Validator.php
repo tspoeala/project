@@ -9,8 +9,6 @@ class Validator
 
     public function validate($formData)
     {
-
-
         if ($formData['password'] != $formData['password_confirmation']) {
             $this->errors['password'] = "Pass should match!";
         }

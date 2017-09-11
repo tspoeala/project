@@ -10,9 +10,10 @@
                         <?php require('partials/errors.php'); ?>
                         <div class="form-group">
                             <input type="text" name="email" id="email" class="form-control input-lg"
-                                   placeholder="Email Address" value="<?php if (isset($email)) {
-                                echo $email;
-                            } ?>">
+                                   placeholder="Email Address" value=
+                                   " <?php if (isset($email)) {
+                                       echo $email;
+                                   } ?>">
                         </div>
                         <div class="form-group">
                             <input type="password" name="password" id="password" class="form-control input-lg"

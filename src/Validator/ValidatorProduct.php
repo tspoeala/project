@@ -28,15 +28,12 @@ class ValidatorProduct
             $mimetypes = array("image/jpeg", "image/pjpeg", "image/png");
             $extensions = array("jpeg", "jpg", "png");
 
-
             if (!in_array($fileType, $mimetypes)) {
                 $this->errors['extensions'] = "extension not allowed, please choose a JPEG or PNG file.";
-
             }
 
             if (!in_array($fileExt, $extensions)) {
                 $this->errors['extensions'] = "extension not allowed, please choose a JPEG or PNG file.";
-
             }
 
             if ($fileSize > 2097152) {
@@ -100,11 +97,7 @@ class ValidatorProduct
         if ($this->array_has_dupes($productData['characteristic'])) {
             $this->errors['dupes'] = "You choose the same characteristic more times!";
         }
-
-
-
     }
-
 
     public function validate($productData, $request)
     {
@@ -135,7 +128,6 @@ class ValidatorProduct
         $this->validateDescription($productData);
 
         $this->validatePrice($productData);
-
 
         return $this->errors;
     }

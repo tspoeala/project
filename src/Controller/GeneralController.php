@@ -63,7 +63,8 @@ class GeneralController
         if ($currentPage < $totalPages) {
             $next = $currentPage + 1;
         }
-        return array($perPage, $currentPage, $totalPages, $previous, $next);
+        $offset = $perPage * ($currentPage - 1);
+        return array($perPage, $currentPage, $totalPages, $previous, $next, $offset);
     }
 
     public function configPagination($perPage, $currentPage, $totalPages, $previous, $next, $pageTitle, $pageURL)

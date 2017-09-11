@@ -4,9 +4,8 @@
     <div class="container">
         <div class="row">
 
-
             <div class="col-sm-12 col-md-10 col-md-offset-1">
-                <?php if (count($cart)) { ?>
+                <?php if (!empty($cart)) { ?>
                     <table class="table table-hover">
                         <thead>
                         <tr>

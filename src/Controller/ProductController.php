@@ -2,6 +2,7 @@
 
 namespace Src\Controllers;
 
+use Src\Repository\ProductCharacteristicsRepository;
 use Src\Repository\ProductRepository;
 use Src\Validator\ValidatorProduct;
 use App\AppContainer;
@@ -16,7 +17,6 @@ class ProductController extends GeneralController
         $productData['price'] = trim($productData['price']);
         $productData['description'] = trim($productData['description']);
         return $productData;
-
     }
 
     public function insertProductIntoTable($id, $productData, $image)
@@ -27,7 +27,6 @@ class ProductController extends GeneralController
             'price' => $productData['price'],
             'description' => strip_tags($productData['description']),
             'photo' => $image,
-
         ]);
     }
 
@@ -54,6 +53,18 @@ class ProductController extends GeneralController
         ]);
     }
 
+    public function getErrorsInSession($request, $errors, $productData, $path)
+    {
+        if (!empty($errors)) {
+            /** @var Request $request */
+            $request->writeToSession('errors', $errors);
+            $request->writeToSession('productData', $productData);
+            $this->redirect($path);
+        }
+        $request->removeFromSession('productData');
+        $request->removeFromSession('errors');
+    }
+
     public function addProduct(Request $request)
     {
         $id = $request->getSession()["user"]->id;
@@ -61,13 +72,7 @@ class ProductController extends GeneralController
         $viewParameters = $request->getSession();
         $errors = (new ValidatorProduct())->validate($productData, $request);
         $viewParameters['errors'] = $errors;
-        if (!empty($errors)) {
-            $request->writeToSession('errors', $errors);
-            $request->writeToSession('productData', $productData);
-            $this->redirect('view?id=' . $id);
-        }
-        $request->removeFromSession('productData');
-        $request->removeFromSession('errors');
+        $this->getErrorsInSession($request, $errors, $productData, 'view?id=' . $id);
         $image = $request->getFilesData('photo')["name"];
         $request->writeToSession('image', $image);
         $this->insertProductIntoTable($id, $productData, $image);
@@ -109,7 +114,6 @@ class ProductController extends GeneralController
         if (!empty($request->getSession()["product"])) {
             $productData = $this->trimProductData($request->getFormData());
             $viewParameters = $request->getSession();
-            //$pos = strpos(Request::uri(), "updateProduct");
             $photo = $request->getFilesData('photo')['name'];
         }
         if ($photo == null) {
@@ -118,18 +122,14 @@ class ProductController extends GeneralController
         } else {
             $errors = (new ValidatorProduct())->validate($productData, $request);
         }
-        if (!empty($errors)) {
-            $request->writeToSession('errors', $errors);
-            $request->writeToSession('formData', $productData);
-            $this->redirect('updateProduct?id=' . $id);
-        }
+        $this->getErrorsInSession($request, $errors, $productData, 'updateProduct?id=' . $id);
         $this->updateProductIntoTable($id, $idUser, $productData, $photo);
-        $request->removeFromSession('errors');
         if (strcmp($request->getSession()['uri'], 'iMAG/view') == 0) {
             $this->redirect('view?' . $request->getSession()['query']);
-        }
-        if (strcmp($request->getSession()['uri'], 'iMAG') == 0) {
+        } else if (strcmp($request->getSession()['uri'], 'iMAG') == 0) {
             $this->redirect('?' . $request->getSession()['query']);
+        } else {
+            $this->redirect('search?' . $request->getSession()['query']);
         }
         $request->removeFromSession('query');
         $image = $request->getFilesData('photo')["name"];
@@ -152,25 +152,35 @@ class ProductController extends GeneralController
             $this->redirect('');
         }
         $viewParameters['product'] = $product;
+        /**
+         * @var ProductCharacteristicsRepository $productCharacteristicsRepository
+         */
         $productCharacteristicsRepository = AppContainer::get('productCharacteristicsRepository');
-        $characteristics = $productCharacteristicsRepository->join3tables('characteristics.name', 'products_characteristics.value',
-            'characteristics', 'products_characteristics', 'products', 'characteristics.id',
-            'products_characteristics.characteristic_id', 'products_characteristics.product_id', 'products.id_produs', 'id_produs', $productId);
+        $characteristics = $productCharacteristicsRepository->getCharacteristics($productId);
         $viewParameters['characteristics'] = $characteristics;
-        $userOfProduct = AppContainer::get('productRepository')->join2tables('users.username', 'users.firstname', 'users', 'products', 'users.id',
-            'products.id_user', 'id_produs', $productId)[0];
+        $userOfProduct = AppContainer::get('productRepository')->getUserOfProduct($productId);
         $viewParameters['userOfProduct'] = $userOfProduct;
         return Response::view('view_product', $viewParameters);
     }
 
     public function searchProduct(Request $request)
     {
-        $viewParameters = $request->getSession();
-        $titleProductSearch = $request->getQuery()['name'];
-        $viewParameters['titleProductSearch'] = $titleProductSearch;
         /** @var ProductRepository $productRepo */
         $productRepo = AppContainer::get('productRepository');
-        $products = $productRepo->selectByFieldLikeFromTable('title', "$titleProductSearch%");
+        $titleProductSearch = $request->getQuery()['name'];
+        list($perPage, $currentPage, $totalPages, $previous, $next, $offset) = $this->pagination(
+            $request,
+            $productRepo->countSelectByFieldLikeFromTable('title', "$titleProductSearch%")
+        );
+        $viewParameters = array_merge($request->getSession(), $this->configPagination($perPage, $currentPage, $totalPages,
+            $previous, $next, $this->getTitle("iMAG"), '/iMAG/search?name=' . $titleProductSearch));
+        $viewParameters['titleProductSearch'] = $titleProductSearch;
+        if (isset($request->getSession()['user'])) {
+            $viewParameters['esteLogat'] = 'Este Logat!';
+        }
+        $request->writeToSession('uri', Request::uri());
+        $request->writeToSession('query', $request->giveTheQuery());
+        $products = $productRepo->selectByFieldLikeFromTable('title', "$titleProductSearch%", $offset, $perPage);
         $viewParameters['products'] = $products;
         $viewParameters['pageTitle'] = $this->getTitle("Search Product");
         return Response::view('search_product', $viewParameters);
