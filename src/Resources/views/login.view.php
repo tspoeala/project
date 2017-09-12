@@ -11,7 +11,7 @@
                         <div class="form-group">
                             <input type="text" name="email" id="email" class="form-control input-lg"
                                    placeholder="Email Address" value=
-                                   " <?php if (isset($email)) {
+                                   "<?php if (isset($email)) {
                                        echo $email;
                                    } ?>">
                         </div>

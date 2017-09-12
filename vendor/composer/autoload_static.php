@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit10da88215a4b55030b69bf8c99231191
+class ComposerStaticInited676a6c10f481855d7bdfc7705798a3
 {
     public static $classMap = array (
         'App\\AppContainer' => __DIR__ . '/../..' . '/app/AppContainer.php',
@@ -14,9 +14,6 @@ class ComposerStaticInit10da88215a4b55030b69bf8c99231191
         'App\\Request' => __DIR__ . '/../..' . '/app/Request.php',
         'App\\Response' => __DIR__ . '/../..' . '/app/Response.php',
         'App\\Router' => __DIR__ . '/../..' . '/app/Router.php',
-        'ComposerAutoloaderInit10da88215a4b55030b69bf8c99231191' => __DIR__ . '/..' . '/composer/autoload_real.php',
-        'Composer\\Autoload\\ClassLoader' => __DIR__ . '/..' . '/composer/ClassLoader.php',
-        'Composer\\Autoload\\ComposerStaticInit10da88215a4b55030b69bf8c99231191' => __DIR__ . '/..' . '/composer/autoload_static.php',
         'Src\\Controllers\\CartController' => __DIR__ . '/../..' . '/src/Controller/CartController.php',
         'Src\\Controllers\\DefaultController' => __DIR__ . '/../..' . '/src/Controller/DefaultController.php',
         'Src\\Controllers\\GeneralController' => __DIR__ . '/../..' . '/src/Controller/GeneralController.php',
@@ -27,6 +24,7 @@ class ComposerStaticInit10da88215a4b55030b69bf8c99231191
         'Src\\Repository\\ProductCharacteristicsRepository' => __DIR__ . '/../..' . '/src/Repository/ProductCharacteristicsRepository.php',
         'Src\\Repository\\ProductRepository' => __DIR__ . '/../..' . '/src/Repository/ProductRepository.php',
         'Src\\Repository\\UserRepository' => __DIR__ . '/../..' . '/src/Repository/UserRepository.php',
+        'Src\\Validator\\Validator' => __DIR__ . '/../..' . '/src/Validator/Validator.php',
         'Src\\Validator\\ValidatorLogin' => __DIR__ . '/../..' . '/src/Validator/ValidatorLogin.php',
         'Src\\Validator\\ValidatorProduct' => __DIR__ . '/../..' . '/src/Validator/ValidatorProduct.php',
         'Src\\Validator\\ValidatorRegister' => __DIR__ . '/../..' . '/src/Validator/ValidatorRegister.php',
@@ -35,7 +33,7 @@ class ComposerStaticInit10da88215a4b55030b69bf8c99231191
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInit10da88215a4b55030b69bf8c99231191::$classMap;
+            $loader->classMap = ComposerStaticInited676a6c10f481855d7bdfc7705798a3::$classMap;
 
         }, null, ClassLoader::class);
     }
